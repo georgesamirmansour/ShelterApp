@@ -17,6 +17,7 @@ import com.example.gorgesamir.shelterapp.data.PetsDbHelper;
 public class CatalogActivity extends AppCompatActivity {
 
     PetsDbHelper petsDbHelper = new PetsDbHelper(this);
+    PetContract.PetEntry entry;
 
     @Override
     protected void onStart() {
@@ -39,7 +40,7 @@ public class CatalogActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-//        displayDataBaseInfo();
+        displayDataBaseInfo();
     }
 
     @Override
@@ -70,11 +71,11 @@ public class CatalogActivity extends AppCompatActivity {
     private void displayDataBaseInfo() {
         SQLiteDatabase database = petsDbHelper.getReadableDatabase();
         String[] projection = {
-                PetContract.PetEntry._ID,
-                PetContract.PetEntry.COLUMN_NAME,
-                PetContract.PetEntry.COLUMN_BREED,
-                PetContract.PetEntry.COLUMN_GENDER,
-                PetContract.PetEntry.COLUMN_WEIGHT
+                entry._ID,
+                entry.COLUMN_NAME,
+                entry.COLUMN_BREED,
+                entry.COLUMN_GENDER,
+                entry.COLUMN_WEIGHT
         };
         Cursor cursor = database.query(
                 PetContract.PetEntry.TABLE_NAME
@@ -85,9 +86,9 @@ public class CatalogActivity extends AppCompatActivity {
                 , null
                 , null
         );
+        TextView displayTextView = (TextView) findViewById(R.id.text_view_pet);
         try {
-            TextView displayTextView = (TextView) findViewById(R.id.text_view_pet);
-            displayTextView.setText("Number of rows in DB is " + cursor.getCount());
+            displayTextView.setText("Number of rows in DB is " + cursor.getCount() + "\n");
             displayTextView.append(PetContract.PetEntry._ID + " - " +
                     PetContract.PetEntry.COLUMN_NAME + " - " +
                     PetContract.PetEntry.COLUMN_BREED + " - " +
@@ -95,11 +96,11 @@ public class CatalogActivity extends AppCompatActivity {
                     + PetContract.PetEntry.COLUMN_WEIGHT + " - " + "\n"
             );
 
-            int idColumnIndex = cursor.getColumnIndex(PetContract.PetEntry._ID);
-            int nameColumnIndex = cursor.getColumnIndex(PetContract.PetEntry.COLUMN_NAME);
-            int breedColumnIndex = cursor.getColumnIndex(PetContract.PetEntry.COLUMN_BREED);
-            int genderColumnIndex = cursor.getColumnIndex(PetContract.PetEntry.COLUMN_GENDER);
-            int weightCurrentIndex = cursor.getColumnIndex(PetContract.PetEntry.COLUMN_WEIGHT);
+            int idColumnIndex = cursor.getColumnIndex(entry._ID);
+            int nameColumnIndex = cursor.getColumnIndex(entry.COLUMN_NAME);
+            int breedColumnIndex = cursor.getColumnIndex(entry.COLUMN_BREED);
+            int genderColumnIndex = cursor.getColumnIndex(entry.COLUMN_GENDER);
+            int weightCurrentIndex = cursor.getColumnIndex(entry.COLUMN_WEIGHT);
 
             while (cursor.moveToNext()) {
 
@@ -109,9 +110,15 @@ public class CatalogActivity extends AppCompatActivity {
                 int currentGender = cursor.getInt(genderColumnIndex);
                 int currentWeight = cursor.getInt(weightCurrentIndex);
 
-                displayTextView.append("\n" + currentID + " - " + currentName
-                        + " - " + currentBreed + " - " + currentGender
-                        + " - " + currentWeight + " - ");
+                displayTextView.append("\n"
+                        + currentID + " - "
+                        + currentName + " - "
+                        + currentBreed + " - "
+                        + currentGender + " - "
+                        + currentWeight + " - ");
+                if (cursor.equals(null)) {
+                    break;
+                }
             }
         } finally {
             cursor.close();
